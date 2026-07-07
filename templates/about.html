@@ -1,0 +1,131 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+    {% if airports %}Our Supported Airports
+    {% elif airlines %}Partner Airlines Fleet
+    {% elif offers %}Special Offers & Rewards
+    {% else %}About SkyZone Airlines
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+{% if airports %}
+<div class="skyzone-bg-airport w-100 py-5" style="margin-top:-24px; margin-bottom:-48px;">
+    <div class="container">
+{% else %}
+<div class="container py-5">
+{% endif %}
+    
+    <!-- 1. AIRPORTS VIEW -->
+    {% if airports %}
+        <div class="text-center mb-5 animate-on-scroll">
+            <h2 class="fw-bold">Our Supported Airport Hubs</h2>
+            <p class="text-secondary">Explore airports serviced directly by SkyZone flights, along with terminals and directions.</p>
+        </div>
+        <div class="row g-4">
+            {% for a in airports %}
+                <div class="col-lg-6 animate-on-scroll">
+                    <div class="glass-card p-4 h-100 d-flex flex-column justify-content-between">
+                        <div>
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <h4 class="fw-bold mb-0 text-primary">{{ a.city }} ({{ a.code }})</h4>
+                                <span class="badge bg-secondary rounded-pill px-3">{{ a.country }}</span>
+                            </div>
+                            <h5 class="fw-bold mb-2">{{ a.name }}</h5>
+                            <p class="text-secondary small mb-3"><strong>Terminal Details:</strong> {{ a.terminal_info }}</p>
+                            <p class="text-muted small"><strong>Support Contact:</strong> {{ a.contact_details }}</p>
+                        </div>
+                        
+                        <!-- Embedded Google Map -->
+                        {% if a.map_embed_url %}
+                            <div class="ratio ratio-16x9 rounded overflow-hidden mt-3" style="border: 1px solid var(--border-color);">
+                                <iframe src="{{ a.map_embed_url }}" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="Google Map location of {{ a.name }}"></iframe>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+    <!-- 2. AIRLINES VIEW -->
+    {% elif airlines %}
+        <div class="text-center mb-5 animate-on-scroll">
+            <h2 class="fw-bold">Our Partner Airline Carriers</h2>
+            <p class="text-secondary">Discover our partner networks, active flight fleets and operational details.</p>
+        </div>
+        <div class="row g-4">
+            {% for a in airlines %}
+                <div class="col-md-6 col-lg-4 animate-on-scroll">
+                    <div class="glass-card p-4 text-center">
+                        {% if a.logo %}
+                            <img src="{{ a.logo.url }}" alt="{{ a.name }} Logo" class="mb-3" style="height:80px; width:80px; object-fit:contain; border-radius:10px;">
+                        {% endif %}
+                        <h5 class="fw-bold mb-1">{{ a.name }}</h5>
+                        <span class="badge bg-primary px-3 rounded-pill mb-3">Carrier Code: {{ a.code }}</span>
+                        <p class="text-secondary small mb-3">{{ a.fleet_details }}</p>
+                        <hr style="background-color: var(--border-color);">
+                        <p class="text-muted small mb-0">{{ a.contact_details }}</p>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+    <!-- 3. OFFERS VIEW -->
+    {% elif offers %}
+        <div class="text-center mb-5 animate-on-scroll">
+            <h2 class="fw-bold">SkyZone Special Offers & Coupons</h2>
+            <p class="text-secondary">Apply verified promotional discount codes to claim travel rewards.</p>
+        </div>
+        <div class="row g-4">
+            <!-- Render offer cards -->
+            <div class="col-md-6 col-lg-4 animate-on-scroll">
+                <div class="glass-card p-4 text-center border-top border-4 border-primary">
+                    <h5 class="fw-bold text-primary mb-2">Student Privilege Code</h5>
+                    <p class="text-secondary small">Save 10% on international flights. Submit enrollment card details on check-in.</p>
+                    <div class="p-2 border rounded font-monospace fw-bold fs-5 text-uppercase bg-light" style="background-color: var(--bg-primary) !important;">STUDENT10</div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-4 animate-on-scroll">
+                <div class="glass-card p-4 text-center border-top border-4 border-success">
+                    <h5 class="fw-bold text-success mb-2">Summer Festival Rebate</h5>
+                    <p class="text-secondary small">Applicable on any destination routing. Claim flat $50 discount instantly.</p>
+                    <div class="p-2 border rounded font-monospace fw-bold fs-5 text-uppercase bg-light" style="background-color: var(--bg-primary) !important;">FESTIVAL50</div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-4 animate-on-scroll">
+                <div class="glass-card p-4 text-center border-top border-4 border-warning">
+                    <h5 class="fw-bold text-warning mb-2">Early Bird Special</h5>
+                    <p class="text-secondary small">Book at least 30 days prior to get 15% off base fares.</p>
+                    <div class="p-2 border rounded font-monospace fw-bold fs-5 text-uppercase bg-light" style="background-color: var(--bg-primary) !important;">EARLYBIRD</div>
+                </div>
+            </div>
+        </div>
+
+    <!-- 4. GENERAL ABOUT VIEW -->
+    {% else %}
+        <div class="row g-5 align-items-center">
+            <div class="col-lg-6 animate-on-scroll">
+                <span class="text-primary fw-bold text-uppercase small">Our Mission</span>
+                <h2 class="fw-bold mt-2 mb-4">Redefining Airline Bookings With Modern UX</h2>
+                <p class="text-secondary">SkyZone is created to remove hurdles from ticketing workflows. By offering clean visual layouts, interactive cabin seat mapping, responsive dashboard controls, and instant PDF ticket downloads, we ensure that flight planning is completely stress-free.</p>
+                <p class="text-secondary">Partnering with top global carriers, our customers have access to flexible schedules and competitive airfares. Start searching for routes now and secure your flight tickets instantly.</p>
+                <a href="{% url 'flights:search' %}" class="btn btn-primary rounded-pill px-4 mt-3">Explore Flight Destinations</a>
+            </div>
+            <div class="col-lg-6 animate-on-scroll">
+                <div class="glass-card p-4 text-center">
+                    <i class="fas fa-history text-primary mb-3" style="font-size: 3rem;"></i>
+                    <h5 class="fw-bold mb-2">Our History</h5>
+                    <p class="text-muted small">Founded in 2026, SkyZone has quickly grown from a small Django prototype into a comprehensive booking portal trusted by travelers worldwide.</p>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% if airports %}
+    </div>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,532 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Book Flight - {{ flight.flight_number }}{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <!-- Steps Indicator -->
+    <div class="row justify-content-center mb-5">
+        <div class="col-md-8">
+            <div class="steps-container">
+                <div class="step-item active">1</div>
+                <div class="step-item">2</div>
+                <div class="step-item">3</div>
+            </div>
+            <div class="d-flex justify-content-between small text-muted px-2" style="margin-top:-10px;">
+                <span>Passenger Details</span>
+                <span>Payment Simulator</span>
+                <span>Confirmation</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- 1. Passenger Form & Seat Assignments -->
+        <div class="col-lg-8">
+            <form action="{% url 'bookings:book_flight' flight.id %}" method="POST" id="booking-form">
+                {% csrf_token %}
+                <h4 class="fw-bold mb-4"><i class="fas fa-users text-primary me-2"></i>Passenger Information</h4>
+                
+                <!-- Container for passenger forms -->
+                <div id="passenger-container">
+                    <!-- Default Passenger 1 Card -->
+                    <div class="glass-card p-4 mb-4 passenger-card active" data-passenger-index="1" style="border-left: 5px solid var(--primary-color);">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="fw-bold mb-0">Passenger #1 (Primary)</h5>
+                            <span class="badge bg-primary px-3 rounded-pill seat-badge" id="seat-badge-1">No Seat Selected</span>
+                        </div>
+                        
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="first_name_1" class="form-label small fw-bold">First Name</label>
+                                <input type="text" name="first_name" id="first_name_1" class="form-control" required placeholder="John">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="last_name_1" class="form-label small fw-bold">Last Name</label>
+                                <input type="text" name="last_name" id="last_name_1" class="form-control" required placeholder="Doe">
+                            </div>
+                            
+                            <div class="col-md-4">
+                                <label for="age_1" class="form-label small fw-bold">Age</label>
+                                <input type="number" name="age" id="age_1" class="form-control" required min="1" max="120" placeholder="30">
+                            </div>
+                            <div class="col-md-4">
+                                <label for="gender_1" class="form-label small fw-bold">Gender</label>
+                                <select name="gender" id="gender_1" class="form-select" required>
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="nationality_1" class="form-label small fw-bold">Nationality</label>
+                                <input type="text" name="nationality" id="nationality_1" class="form-control" required placeholder="American">
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label for="passport_1" class="form-label small fw-bold">Passport Number</label>
+                                <input type="text" name="passport_number" id="passport_1" class="form-control" required placeholder="US1234567">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="requests_1" class="form-label small fw-bold">Special Requests</label>
+                                <input type="text" name="special_requests" id="requests_1" class="form-control" placeholder="Wheelchair access, diabetic meal...">
+                            </div>
+                            
+                            <!-- Hidden input holding seat model primary key -->
+                            <input type="hidden" name="seat_id" id="seat-id-1" required>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Add Passenger Button -->
+                <div class="mb-4">
+                    <button type="button" class="btn btn-secondary rounded-pill btn-sm" id="btn-add-passenger">
+                        <i class="fas fa-plus me-1"></i>Add Another Passenger
+                    </button>
+                </div>
+
+                <!-- Interactive Seating map selection -->
+                <div class="glass-card p-4 mb-4">
+                    <h5 class="fw-bold mb-2">Select Your Cabin Seat</h5>
+                    <p class="text-secondary small mb-4">Click a passenger card above, then click an available seat on the grid to assign it.</p>
+                    
+                    <div class="d-flex justify-content-center gap-3 mb-4 flex-wrap small">
+                        <div>
+                            <span class="legend-box" style="background-color: var(--bg-primary); border-color: rgba(99,102,241,0.4);"></span> Economy
+                        </div>
+                        <div>
+                            <span class="legend-box" style="background-color: rgba(6,182,212,0.05); border-color: rgba(6,182,212,0.4);"></span> Business
+                        </div>
+                        <div>
+                            <span class="legend-box" style="background-color: rgba(245,158,11,0.05); border-color: rgba(245,158,11,0.4);"></span> Premium
+                        </div>
+                        <div>
+                            <span class="legend-box" style="background-color: #cbd5e1;"></span> Reserved
+                        </div>
+                        <div>
+                            <span class="legend-box" style="background-color: var(--primary-color);"></span> Selected
+                        </div>
+                    </div>
+
+                    <div class="seat-map-container" style="max-height: 380px; overflow-y: auto;">
+                        {% for row in "12345" %}
+                            <div class="seat-row">
+                                <span class="seat-row-number">{{ row }}</span>
+                                {% for col in "ABCDEF" %}
+                                    {% with seat_num=row|add:col %}
+                                        {% if col == 'C' or col == 'D' %}
+                                            {% if col == 'D' %}<div class="seat-aisle"></div>{% endif %}
+                                        {% endif %}
+                                        
+                                        {% for seat in seats %}
+                                            {% if seat.seat_number == seat_num %}
+                                                <button type="button" class="seat {% if seat.is_reserved %}reserved{% elif seat.seat_class == 'First' %}first-class{% elif seat.seat_class == 'Business' %}business{% else %}economy{% endif %} {% if seat.is_premium %}premium{% endif %}" 
+                                                        data-seat-id="{{ seat.id }}" 
+                                                        data-seat-num="{{ seat.seat_number }}" 
+                                                        data-multiplier="{{ seat.price_multiplier }}" 
+                                                        {% if seat.is_reserved %}disabled{% endif %}
+                                                        title="Seat {{ seat.seat_number }} - {{ seat.seat_class }} (Multiplier: x{{ seat.price_multiplier }})">
+                                                    {{ seat.seat_number }}
+                                                </button>
+                                            {% endif %}
+                                        {% endfor %}
+                                    {% endwith %}
+                                {% endfor %}
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="text-end">
+                    <button type="submit" class="btn btn-primary rounded-pill px-5 btn-lg hover-glow" id="btn-submit-booking">
+                        Proceed to Payment<i class="fas fa-arrow-right ms-2"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- 2. Dynamic Fare Calculator Summary -->
+        <div class="col-lg-4">
+            <div class="glass-card p-4 position-sticky" style="top: 100px;">
+                <h5 class="fw-bold mb-4"><i class="fas fa-receipt text-primary me-2"></i>Fare Calculator</h5>
+                
+                <div class="d-flex flex-column gap-3 small">
+                    <div class="d-flex justify-content-between">
+                        <span class="text-secondary">Base Fare (Per passenger)</span>
+                        <span class="fw-bold">${{ flight.base_fare|floatformat:2 }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span class="text-secondary">Passengers</span>
+                        <span class="fw-bold" id="calc-passengers">1</span>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span class="text-secondary">Seat Upgrade Charges</span>
+                        <span class="fw-bold" id="calc-upgrades">$0.00</span>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span class="text-secondary">Taxes (10%)</span>
+                        <span class="fw-bold" id="calc-taxes">$0.00</span>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span class="text-secondary">Convenience Fee</span>
+                        <span class="fw-bold">$20.00</span>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between text-success d-none" id="discount-row">
+                        <span class="fw-bold">Coupon Discount</span>
+                        <span class="fw-bold" id="calc-discount">-$0.00</span>
+                    </div>
+                    
+                    <hr class="my-2" style="background-color: var(--border-color);">
+                    
+                    <div class="d-flex justify-content-between fs-5 fw-extrabold text-primary">
+                        <span>Total Price</span>
+                        <span id="calc-total">$0.00</span>
+                    </div>
+                </div>
+
+                <!-- Coupon Entry Box -->
+                <div class="mt-4">
+                    <label for="coupon-input" class="form-label small fw-bold">Have a Promo Coupon?</label>
+                    <div class="input-group">
+                        <input type="text" name="coupon_code" id="coupon-input" form="booking-form" class="form-control form-control-sm text-uppercase" placeholder="STUDENT10, FESTIVAL50">
+                        <button type="button" class="btn btn-outline-primary btn-sm" id="btn-apply-coupon">Apply</button>
+                    </div>
+                    <span class="small text-muted d-block mt-1">Try: <strong>STUDENT10</strong> (10% off), <strong>FESTIVAL50</strong> ($50 off)</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        let passengerCount = 1;
+        let activeIndex = 1;
+        const flightBaseFare = parseFloat("{{ flight.base_fare }}");
+        
+        // Multipliers mapped to selected seat for each passenger
+        let passengerSeats = {
+            1: { id: '', num: '', multiplier: 1.0 }
+        };
+
+        const container = document.getElementById('passenger-container');
+        const addBtn = document.getElementById('btn-add-passenger');
+        const calcPassengers = document.getElementById('calc-passengers');
+        const calcUpgrades = document.getElementById('calc-upgrades');
+        const calcTaxes = document.getElementById('calc-taxes');
+        const calcDiscount = document.getElementById('calc-discount');
+        const calcTotal = document.getElementById('calc-total');
+        const discountRow = document.getElementById('discount-row');
+        const couponInput = document.getElementById('coupon-input');
+        const applyCouponBtn = document.getElementById('btn-apply-coupon');
+        
+        let appliedDiscount = 0.0;
+        let couponCodeValue = "";
+
+        // Toggles active card class
+        function bindCardClicks() {
+            document.querySelectorAll('.passenger-card').forEach(card => {
+                card.onclick = () => {
+                    document.querySelectorAll('.passenger-card').forEach(c => c.classList.remove('active'));
+                    card.classList.add('active');
+                    activeIndex = parseInt(card.getAttribute('data-passenger-index'));
+                    highlightSelectedSeatOnGrid();
+                };
+            });
+        }
+        
+        bindCardClicks();
+
+        // 1. Add Passenger functionality
+        if (addBtn) {
+            addBtn.addEventListener('click', () => {
+                if (passengerCount >= 5) {
+                    showToast("Maximum of 5 passengers per booking reached.", "error");
+                    return;
+                }
+                passengerCount++;
+                passengerSeats[passengerCount] = { id: '', num: '', multiplier: 1.0 };
+                
+                const cardHtml = `
+                    <div class="glass-card p-4 mb-4 passenger-card" data-passenger-index="${passengerCount}" style="border-left: 5px solid var(--border-color);">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="fw-bold mb-0">Passenger #${passengerCount}</h5>
+                            <button type="button" class="btn btn-outline-danger btn-sm rounded-pill px-2 py-0 border-0" onclick="removePassengerCard(${passengerCount})">
+                                <i class="fas fa-trash-alt me-1"></i>Remove
+                            </button>
+                            <span class="badge bg-primary px-3 rounded-pill seat-badge" id="seat-badge-${passengerCount}">No Seat Selected</span>
+                        </div>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold">First Name</label>
+                                <input type="text" name="first_name" class="form-control" required placeholder="Passenger first name">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold">Last Name</label>
+                                <input type="text" name="last_name" class="form-control" required placeholder="Passenger last name">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label small fw-bold">Age</label>
+                                <input type="number" name="age" class="form-control" required min="1" max="120" placeholder="30">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label small fw-bold">Gender</label>
+                                <select name="gender" class="form-select" required>
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label small fw-bold">Nationality</label>
+                                <input type="text" name="nationality" class="form-control" required placeholder="nationality">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold">Passport Number</label>
+                                <input type="text" name="passport_number" class="form-control" required placeholder="passport">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold">Special Requests</label>
+                                <input type="text" name="special_requests" class="form-control" placeholder="requests">
+                            </div>
+                            <input type="hidden" name="seat_id" id="seat-id-${passengerCount}" required>
+                        </div>
+                    </div>
+                `;
+                
+                // Append card
+                container.insertAdjacentHTML('beforeend', cardHtml);
+                bindCardClicks();
+                
+                // Trigger click on newly added card to make it active
+                document.querySelector(`.passenger-card[data-passenger-index="${passengerCount}"]`).click();
+                updateFareCalculations();
+            });
+        }
+
+        // 2. Remove Passenger functionality
+        window.removePassengerCard = function(index) {
+            const card = document.querySelector(`.passenger-card[data-passenger-index="${index}"]`);
+            if (card) {
+                card.remove();
+                delete passengerSeats[index];
+                
+                // Reset indexes of remaining cards
+                let currentIdx = 1;
+                document.querySelectorAll('.passenger-card').forEach(c => {
+                    c.setAttribute('data-passenger-index', currentIdx);
+                    const head = c.querySelector('h5');
+                    if (currentIdx === 1) {
+                        head.innerHTML = 'Passenger #1 (Primary)';
+                        // Remove trash button if present
+                    } else {
+                        head.innerHTML = `Passenger #${currentIdx}`;
+                    }
+                    c.style.borderLeftColor = 'var(--border-color)';
+                    currentIdx++;
+                });
+                
+                passengerCount = currentIdx - 1;
+                
+                // Re-build passenger seats
+                let newPassengerSeats = {};
+                let idx = 1;
+                for (let k in passengerSeats) {
+                    newPassengerSeats[idx] = passengerSeats[k];
+                    const seatIdInput = document.getElementById(`seat-id-${idx}`);
+                    const badge = document.getElementById(`seat-badge-${idx}`);
+                    if (seatIdInput) seatIdInput.id = `seat-id-${idx}`;
+                    if (badge) badge.id = `seat-badge-${idx}`;
+                    idx++;
+                }
+                passengerSeats = newPassengerSeats;
+                
+                activeIndex = 1;
+                const primaryCard = document.querySelector('.passenger-card[data-passenger-index="1"]');
+                if (primaryCard) {
+                    primaryCard.classList.add('active');
+                    primaryCard.style.borderLeftColor = 'var(--primary-color)';
+                }
+                
+                updateFareCalculations();
+                highlightSelectedSeatOnGrid();
+            }
+        };
+
+        // 3. Seat Grid Clicking Function
+        document.querySelectorAll('.seat:not(.reserved)').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const seatId = btn.getAttribute('data-seat-id');
+                const seatNum = btn.getAttribute('data-seat-num');
+                const mult = parseFloat(btn.getAttribute('data-multiplier') || '1.0');
+                
+                // Check if this seat is already selected by another passenger
+                for (let p in passengerSeats) {
+                    if (passengerSeats[p].id === seatId) {
+                        if (parseInt(p) === activeIndex) {
+                            // Toggle off if clicking the currently assigned seat
+                            passengerSeats[activeIndex] = { id: '', num: '', multiplier: 1.0 };
+                            document.getElementById(`seat-id-${activeIndex}`).value = '';
+                            document.getElementById(`seat-badge-${activeIndex}`).innerText = 'No Seat Selected';
+                            showToast(`Seat ${seatNum} deselected for Passenger #${activeIndex}`, "success");
+                            highlightSelectedSeatOnGrid();
+                            updateFareCalculations();
+                            return;
+                        } else {
+                            showToast(`Seat ${seatNum} is already selected by Passenger #${p}.`, "error");
+                            return;
+                        }
+                    }
+                }
+
+                // Determine target passenger to assign seat to
+                let targetIndex = activeIndex;
+                if (passengerSeats[targetIndex] && passengerSeats[targetIndex].id) {
+                    // Find first passenger slot without an assigned seat
+                    for (let p = 1; p <= passengerCount; p++) {
+                        if (!passengerSeats[p] || !passengerSeats[p].id) {
+                            targetIndex = p;
+                            break;
+                        }
+                    }
+                }
+
+                // Focus the target passenger card
+                activeIndex = targetIndex;
+                document.querySelectorAll('.passenger-card').forEach(c => c.classList.remove('active'));
+                const activeCard = document.querySelector(`.passenger-card[data-passenger-index="${activeIndex}"]`);
+                if (activeCard) activeCard.classList.add('active');
+
+                // Assign seat details to active passenger
+                passengerSeats[activeIndex] = { id: seatId, num: seatNum, multiplier: mult };
+                
+                // Update hidden input and badge inside card
+                document.getElementById(`seat-id-${activeIndex}`).value = seatId;
+                document.getElementById(`seat-badge-${activeIndex}`).innerText = `Seat: ${seatNum}`;
+                
+                showToast(`Seat ${seatNum} assigned to Passenger #${activeIndex}`, "success");
+                
+                highlightSelectedSeatOnGrid();
+                updateFareCalculations();
+            });
+        });
+
+        // Highlights seats currently booked in this transaction
+        function highlightSelectedSeatOnGrid() {
+            document.querySelectorAll('.seat:not(.reserved)').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            
+            for (let p in passengerSeats) {
+                const sId = passengerSeats[p].id;
+                if (sId) {
+                    const btn = document.querySelector(`.seat[data-seat-id="${sId}"]`);
+                    if (btn) btn.classList.add('selected');
+                }
+            }
+        }
+
+        // 4. Coupon Codes handling
+        if (applyCouponBtn && couponInput) {
+            applyCouponBtn.addEventListener('click', () => {
+                const code = couponInput.value.trim().toUpperCase();
+                couponCodeValue = code;
+                
+                if (code === 'STUDENT10') {
+                    appliedDiscount = 0.10; // 10%
+                    showToast('Coupon STUDENT10 applied! 10% off base fares.', 'success');
+                } else if (code === 'FESTIVAL50') {
+                    appliedDiscount = 50.00; // Flat $50
+                    showToast('Coupon FESTIVAL50 applied! Flat $50 off.', 'success');
+                } else if (code === 'EARLYBIRD') {
+                    appliedDiscount = 0.15; // 15%
+                    showToast('Coupon EARLYBIRD applied! 15% off base fares.', 'success');
+                } else {
+                    appliedDiscount = 0.0;
+                    showToast('Invalid Coupon Code.', 'error');
+                }
+                updateFareCalculations();
+            });
+        }
+
+        function animateUpdate(element) {
+            if (!element) return;
+            element.classList.remove('fade-in');
+            void element.offsetWidth; // force reflow
+            element.classList.add('fade-in');
+        }
+
+        // 5. Update invoice amounts
+        function updateFareCalculations() {
+            calcPassengers.innerText = passengerCount;
+            
+            // Upgrade calculations
+            let seatUpgrades = 0.0;
+            for (let p in passengerSeats) {
+                const m = passengerSeats[p].multiplier;
+                if (m > 1.0) {
+                    // Extra upgrade is difference of base_fare multiplied
+                    seatUpgrades += flightBaseFare * (m - 1.0);
+                }
+            }
+            
+            calcUpgrades.innerText = `$${seatUpgrades.toFixed(2)}`;
+            animateUpdate(calcUpgrades);
+            
+            // Subtotal
+            const baseTotal = flightBaseFare * passengerCount;
+            const subtotal = baseTotal + seatUpgrades;
+            
+            // Taxes
+            const taxes = subtotal * 0.10;
+            calcTaxes.innerText = `$${taxes.toFixed(2)}`;
+            animateUpdate(calcTaxes);
+            
+            // Discount calculation
+            let discAmt = 0.0;
+            if (appliedDiscount > 0.0) {
+                if (appliedDiscount <= 1.0) {
+                    // Percentage coupon
+                    discAmt = baseTotal * appliedDiscount;
+                } else {
+                    // Flat coupon
+                    discAmt = Math.min(appliedDiscount, baseTotal);
+                }
+                
+                discountRow.classList.remove('d-none');
+                calcDiscount.innerText = `-$${discAmt.toFixed(2)}`;
+                animateUpdate(calcDiscount);
+            } else {
+                discountRow.classList.add('d-none');
+            }
+            
+            // Final total
+            const grandTotal = subtotal + taxes + 20.00 - discAmt;
+            calcTotal.innerText = `$${Math.max(0, grandTotal).toFixed(2)}`;
+            animateUpdate(calcTotal);
+        }
+        
+        updateFareCalculations();
+        
+        // Form submit validator
+        const form = document.getElementById('booking-form');
+        if (form) {
+            form.addEventListener('submit', (e) => {
+                // Ensure all seats are allocated
+                for (let p = 1; p <= passengerCount; p++) {
+                    const seatVal = document.getElementById(`seat-id-${p}`).value;
+                    if (!seatVal) {
+                        e.preventDefault();
+                        showToast(`Please select a seat for Passenger #${p}.`, 'error');
+                        return;
+                    }
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}

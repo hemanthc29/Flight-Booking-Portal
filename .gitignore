@@ -1,0 +1,8 @@
+__pycache__/
+*.pyc
+.gemini/
+.idea/
+.vscode/
+*.log
+*.sqlite3
+db.sqlite3

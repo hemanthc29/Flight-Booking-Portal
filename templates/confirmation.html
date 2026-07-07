@@ -1,0 +1,122 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Booking Confirmed - SkyZone{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <!-- Steps Indicator -->
+    <div class="row justify-content-center mb-5">
+        <div class="col-md-8">
+            <div class="steps-container">
+                <div class="step-item completed">1</div>
+                <div class="step-item completed">2</div>
+                <div class="step-item active">3</div>
+            </div>
+            <div class="d-flex justify-content-between small text-muted px-2" style="margin-top:-10px;">
+                <span>Passenger Details</span>
+                <span>Payment Simulator</span>
+                <span>Confirmation</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Header -->
+    <div class="row justify-content-center mb-4">
+        <div class="col-lg-8 text-center animate-on-scroll">
+            <div class="rounded-circle bg-success text-white d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px; box-shadow: 0 0 20px rgba(16, 185, 129, 0.4);">
+                <i class="fas fa-check fa-2x"></i>
+            </div>
+            <h2 class="fw-bold text-success">Booking Confirmed Successfully!</h2>
+            <p class="text-secondary lead">Your payment has been processed and PNR has been generated. An e-ticket has been created.</p>
+        </div>
+    </div>
+
+    <div class="row justify-content-center g-4">
+        <!-- 1. Booking Summary -->
+        <div class="col-lg-8">
+            <div class="glass-card p-4 p-md-5 mb-4 animate-on-scroll">
+                <div class="d-flex justify-content-between align-items-center border-bottom pb-3 mb-4" style="border-color: var(--border-color) !important;">
+                    <div>
+                        <span class="text-muted small">PNR NUMBER</span>
+                        <h4 class="fw-extrabold text-primary mb-0" id="confirmation-pnr">{{ booking.pnr }}</h4>
+                    </div>
+                    <div class="text-end">
+                        <span class="text-muted small">TOTAL AMOUNT</span>
+                        <h4 class="fw-extrabold text-success mb-0">${{ booking.total_amount }}</h4>
+                    </div>
+                </div>
+
+                <h5 class="fw-bold mb-4"><i class="fas fa-plane-departure text-primary me-2"></i>Flight Summary</h5>
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <span class="text-muted small d-block">ROUTE</span>
+                        <span class="fw-bold">{{ booking.flight.route.origin.city }} ({{ booking.flight.route.origin.code }}) &rarr; {{ booking.flight.route.destination.city }} ({{ booking.flight.route.destination.code }})</span>
+                    </div>
+                    <div class="col-md-6">
+                        <span class="text-muted small d-block">DEPARTURE</span>
+                        <span class="fw-bold">{{ booking.flight.departure_time|date:"Y-m-d H:i" }}</span>
+                    </div>
+                    <div class="col-md-6">
+                        <span class="text-muted small d-block">AIRLINE</span>
+                        <span class="fw-bold">{{ booking.flight.airline.name }} ({{ booking.flight.flight_number }})</span>
+                    </div>
+                    <div class="col-md-6">
+                        <span class="text-muted small d-block">CABIN CLASS</span>
+                        <span class="fw-bold">{{ booking.flight.cabin_class }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. Passenger Tickets -->
+            <h5 class="fw-bold mb-3 animate-on-scroll"><i class="fas fa-id-card text-primary me-2"></i>Passenger Tickets & Boarding Passes</h5>
+            <div class="d-flex flex-column gap-3 mb-4">
+                {% for t in tickets %}
+                    <div class="glass-card p-4 animate-on-scroll">
+                        <div class="row align-items-center g-3">
+                            <div class="col-md-6">
+                                <span class="text-muted small d-block">PASSENGER NAME</span>
+                                <h6 class="fw-bold mb-1">{{ t.passenger.first_name }} {{ t.passenger.last_name }}</h6>
+                                <span class="text-secondary small d-block">Nationality: {{ t.passenger.nationality }} &bull; Passport: {{ t.passenger.passport_number }}</span>
+                            </div>
+                            <div class="col-md-3">
+                                <span class="text-muted small d-block">SEAT NUMBER</span>
+                                <h6 class="fw-bold text-primary mb-0">{% if t.passenger.seat %}{{ t.passenger.seat.seat_number }}{% else %}N/A{% endif %}</h6>
+                                <span class="text-muted small">{{ t.passenger.seat.seat_class }} ({{ t.passenger.seat.seat_type }})</span>
+                            </div>
+                            <div class="col-md-3 d-flex flex-column flex-md-row justify-content-md-end gap-2">
+                                <!-- Print -->
+                                <button type="button" class="btn btn-secondary rounded-pill px-3 btn-sm" onclick="window.open('{{ t.pdf_file.url }}', '_blank')" id="btn-print-tkt-{{ t.id }}">
+                                    <i class="fas fa-print me-1"></i>View/Print
+                                </button>
+                                <!-- Download -->
+                                <a href="{% url 'bookings:download_ticket' t.id %}" class="btn btn-primary rounded-pill px-3 btn-sm" id="btn-download-tkt-{{ t.id }}">
+                                    <i class="fas fa-download me-1"></i>Download
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <div class="text-center">
+                <a href="{% url 'flights:home' %}" class="btn btn-primary rounded-pill px-5 btn-lg hover-glow" id="btn-return-home">Back to Home</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Trigger success sound/toast alert
+        if (typeof showToast !== 'undefined') {
+            showToast('Booking Confirmed successfully!', 'success');
+            setTimeout(() => {
+                showToast('Tickets generated and ready for download!', 'success');
+            }, 1000);
+        }
+    });
+</script>
+{% endblock %}

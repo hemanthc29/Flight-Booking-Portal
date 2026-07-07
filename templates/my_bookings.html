@@ -1,0 +1,131 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}My Bookings - SkyZone{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <h4 class="fw-bold mb-4"><i class="fas fa-suitcase text-primary me-2"></i>My Reservations & Booking History</h4>
+            
+            {% if bookings %}
+                <div class="d-flex flex-column gap-4">
+                    {% for booking in bookings %}
+                        <div class="glass-card p-4 animate-on-scroll">
+                            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 border-bottom pb-3 mb-3" style="border-color: var(--border-color) !important;">
+                                <div>
+                                    <span class="badge bg-secondary px-3 py-2 rounded-pill me-2">PNR: {{ booking.pnr }}</span>
+                                    <span class="text-muted small">Booked on: {{ booking.booking_date|date:"Y-m-d H:i" }}</span>
+                                </div>
+                                <div class="d-flex align-items-center gap-2">
+                                    {% if booking.status == 'Confirmed' %}
+                                        <span class="badge bg-success py-2 px-3 rounded-pill"><i class="fas fa-check-circle me-1"></i>Confirmed</span>
+                                    {% elif booking.status == 'Pending' %}
+                                        <span class="badge bg-warning text-dark py-2 px-3 rounded-pill"><i class="fas fa-clock me-1"></i>Pending Payment</span>
+                                    {% else %}
+                                        <span class="badge bg-danger py-2 px-3 rounded-pill"><i class="fas fa-times-circle me-1"></i>Cancelled</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div class="row g-3 align-items-center mb-3">
+                                <!-- Flight Information -->
+                                <div class="col-md-5">
+                                    <div class="d-flex align-items-center gap-3 mb-2">
+                                        {% if booking.flight.airline.logo %}
+                                            <img src="{{ booking.flight.airline.logo.url }}" alt="{{ booking.flight.airline.name }} Logo" style="height:36px; width:36px; object-fit:contain; border-radius:5px;">
+                                        {% endif %}
+                                        <div>
+                                            <h6 class="fw-bold mb-0">{{ booking.flight.airline.name }} &bull; {{ booking.flight.flight_number }}</h6>
+                                            <span class="text-muted small">{{ booking.flight.cabin_class }} Class</span>
+                                        </div>
+                                    </div>
+                                    <h6 class="fw-bold mb-0">
+                                        {{ booking.flight.route.origin.city }} ({{ booking.flight.route.origin.code }}) &rarr; {{ booking.flight.route.destination.city }} ({{ booking.flight.route.destination.code }})
+                                    </h6>
+                                </div>
+
+                                <!-- Date times -->
+                                <div class="col-md-4">
+                                    <span class="text-muted small d-block">DEPARTURE</span>
+                                    <span class="fw-bold">{{ booking.flight.departure_time|date:"Y-m-d H:i" }}</span>
+                                </div>
+
+                                <!-- Cost -->
+                                <div class="col-md-3 text-md-end">
+                                    <span class="text-muted small d-block">TOTAL FARE</span>
+                                    <h5 class="fw-extrabold text-primary mb-0">${{ booking.total_amount }}</h5>
+                                </div>
+                            </div>
+
+                            <!-- List Passengers and Seats -->
+                            <div class="bg-light p-3 rounded-4 mb-3" style="background-color: var(--bg-primary) !important;">
+                                <h6 class="fw-bold mb-2 small text-secondary">PASSENGERS & SEATS</h6>
+                                <div class="d-flex flex-column gap-2 small">
+                                    {% for p in booking.passengers.all %}
+                                        <div class="d-flex justify-content-between">
+                                            <span><i class="fas fa-user text-muted me-2"></i>{{ p.first_name }} {{ p.last_name }}</span>
+                                            <span class="fw-bold text-primary">Seat: {% if p.seat %}{{ p.seat.seat_number }} ({{ p.seat.seat_class }} &bull; {{ p.seat.seat_type }}){% else %}Not Selected{% endif %}</span>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+
+                            <!-- Payment details -->
+                            {% if booking.payment %}
+                                <div class="small text-muted mb-3 d-flex flex-wrap gap-3">
+                                    <span><i class="fas fa-credit-card me-1"></i> Paid via: {{ booking.payment.payment_method }}</span>
+                                    <span><i class="fas fa-receipt me-1"></i> Transaction ID: {{ booking.payment.transaction_id }}</span>
+                                    <span><i class="fas fa-calendar-check me-1"></i> Payment Date: {{ booking.payment.payment_date|date:"Y-m-d H:i" }}</span>
+                                </div>
+                            {% endif %}
+
+                            <!-- Actions -->
+                            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 pt-2 border-top" style="border-color: var(--border-color) !important;">
+                                <div>
+                                    {% if booking.status == 'Confirmed' %}
+                                        <!-- Review Flight Link -->
+                                        <a href="{% url 'flights:details' booking.flight.id %}" class="btn btn-outline-primary btn-sm rounded-pill px-3" id="btn-review-flight-{{ booking.id }}">
+                                            <i class="fas fa-star me-1"></i>Write Review
+                                        </a>
+                                    {% endif %}
+                                </div>
+                                <div class="d-flex gap-2">
+                                    {% if booking.status == 'Pending' %}
+                                        <!-- Resume Payment -->
+                                        <a href="{% url 'payments:process_payment' booking.id %}" class="btn btn-primary btn-sm rounded-pill px-3" id="btn-pay-now-{{ booking.id }}">Pay Now</a>
+                                    {% endif %}
+                                    
+                                    {% if booking.status == 'Confirmed' %}
+                                        <!-- Print Boarding Passes -->
+                                        {% for t in booking.tickets.all %}
+                                            {% if forloop.first %}
+                                                <a href="{% url 'payments:confirmation' booking.id %}" class="btn btn-outline-secondary btn-sm rounded-pill px-3" id="btn-view-passes-{{ booking.id }}"><i class="fas fa-id-card me-1"></i>View Tickets</a>
+                                            {% endif %}
+                                        {% endfor %}
+                                    {% endif %}
+
+                                    {% if booking.status != 'Cancelled' %}
+                                        <!-- Cancel Reservation -->
+                                        <a href="{% url 'bookings:cancel_booking' booking.id %}" class="btn btn-outline-danger btn-sm rounded-pill px-3" onclick="return confirm('Are you sure you want to cancel this booking? All seats will be released.')" id="btn-cancel-booking-{{ booking.id }}">
+                                            Cancel Booking
+                                        </a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="glass-card text-center p-5 animate-on-scroll">
+                    <i class="fas fa-calendar-times text-muted mb-3" style="font-size: 3rem;"></i>
+                    <h5 class="fw-bold">No Bookings Found</h5>
+                    <p class="text-muted">You haven't made any flight bookings yet.</p>
+                    <a href="{% url 'flights:home' %}" class="btn btn-primary rounded-pill mt-2">Search and Book Flights</a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

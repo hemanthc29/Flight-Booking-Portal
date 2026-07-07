@@ -1,0 +1,187 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Secure Checkout - Pay for Booking{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <!-- Steps Indicator -->
+    <div class="row justify-content-center mb-5">
+        <div class="col-md-8">
+            <div class="steps-container">
+                <div class="step-item completed">1</div>
+                <div class="step-item active">2</div>
+                <div class="step-item">3</div>
+            </div>
+            <div class="d-flex justify-content-between small text-muted px-2" style="margin-top:-10px;">
+                <span>Passenger Details</span>
+                <span>Payment Simulator</span>
+                <span>Confirmation</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div class="glass-card p-4 p-md-5">
+                <h4 class="fw-bold mb-3"><i class="fas fa-lock text-success me-2"></i>Secure Payment Gateway</h4>
+                <p class="text-secondary small mb-4">Simulate your payment transaction here. No real currency is exchanged.</p>
+                
+                <div class="alert alert-primary py-3 rounded-4 mb-4 d-flex justify-content-between align-items-center">
+                    <div>
+                        <span class="small d-block text-secondary text-uppercase fw-bold">Amount Due</span>
+                        <h4 class="fw-extrabold text-primary mb-0">${{ booking.total_amount }}</h4>
+                    </div>
+                    <div>
+                        <span class="badge bg-secondary px-3 py-2 rounded-pill">PNR: {{ booking.pnr }}</span>
+                    </div>
+                </div>
+
+                <form action="{% url 'payments:process_payment' booking.id %}" method="POST" id="payment-form">
+                    {% csrf_token %}
+                    
+                    <label class="form-label small fw-bold mb-3">Choose Payment Method</label>
+                    <div class="d-flex flex-column gap-2 mb-4">
+                        <div class="p-3 border rounded-3 d-flex align-items-center justify-content-between payment-method-card active" data-method="Credit Card">
+                            <div class="d-flex align-items-center gap-3">
+                                <input class="form-check-input" type="radio" name="payment_method" id="pay-card" value="Credit Card" checked>
+                                <label class="form-check-label fw-bold" for="pay-card">Credit / Debit Card</label>
+                            </div>
+                            <div class="text-secondary"><i class="fab fa-cc-visa fa-lg me-1"></i><i class="fab fa-cc-mastercard fa-lg"></i></div>
+                        </div>
+
+                        <div class="p-3 border rounded-3 d-flex align-items-center justify-content-between payment-method-card" data-method="UPI">
+                            <div class="d-flex align-items-center gap-3">
+                                <input class="form-check-input" type="radio" name="payment_method" id="pay-upi" value="UPI">
+                                <label class="form-check-label fw-bold" for="pay-upi">UPI (GPay / PhonePe / Paytm)</label>
+                            </div>
+                            <div class="text-secondary"><i class="fas fa-mobile-alt fa-lg"></i></div>
+                        </div>
+
+                        <div class="p-3 border rounded-3 d-flex align-items-center justify-content-between payment-method-card" data-method="Digital Wallet">
+                            <div class="d-flex align-items-center gap-3">
+                                <input class="form-check-input" type="radio" name="payment_method" id="pay-wallet" value="Digital Wallet">
+                                <label class="form-check-label fw-bold" for="pay-wallet">Digital Wallets / Net Banking</label>
+                            </div>
+                            <div class="text-secondary"><i class="fas fa-wallet fa-lg"></i></div>
+                        </div>
+                    </div>
+
+                    <!-- Payment Fields Box -->
+                    <div id="card-fields" class="payment-method-fields mb-4">
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <label for="card_num" class="form-label small fw-bold">Card Number</label>
+                                <input type="text" id="card_num" class="form-control" placeholder="4111 2222 3333 4444" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="expiry" class="form-label small fw-bold">Expiry Date</label>
+                                <input type="text" id="expiry" class="form-control" placeholder="MM/YY" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="cvv" class="form-label small fw-bold">CVV</label>
+                                <input type="password" id="cvv" class="form-control" placeholder="123" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="upi-fields" class="payment-method-fields mb-4 d-none">
+                        <div class="mb-3">
+                            <label for="upi_id" class="form-label small fw-bold">Enter UPI ID</label>
+                            <input type="text" id="upi_id" class="form-control" placeholder="username@upi">
+                        </div>
+                        <div class="text-center p-3 border rounded-4 bg-light" style="background-color: var(--bg-primary) !important; border-color: var(--border-color) !important;">
+                            <i class="fas fa-qrcode text-primary mb-2" style="font-size: 3rem;"></i>
+                            <p class="small text-muted mb-0">Alternatively, scan QR code displayed at check-in counter.</p>
+                        </div>
+                    </div>
+
+                    <div id="wallet-fields" class="payment-method-fields mb-4 d-none">
+                        <div class="mb-3">
+                            <label for="bank_select" class="form-label small fw-bold">Select Bank</label>
+                            <select id="bank_select" class="form-select">
+                                <option value="Chase">Chase Bank</option>
+                                <option value="BoA">Bank of America</option>
+                                <option value="Wells">Wells Fargo</option>
+                                <option value="Citi">Citi Bank</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-success w-100 rounded-pill py-3 btn-lg hover-glow" id="btn-pay-secure">
+                        <i class="fas fa-shield-alt me-2"></i>Authorize Payment
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const payCards = document.querySelectorAll('.payment-method-card');
+        const cardFields = document.getElementById('card-fields');
+        const upiFields = document.getElementById('upi-fields');
+        const walletFields = document.getElementById('wallet-fields');
+
+        payCards.forEach(card => {
+            card.addEventListener('click', () => {
+                payCards.forEach(c => c.classList.remove('active'));
+                card.classList.add('active');
+                
+                const method = card.getAttribute('data-method');
+                const radio = card.querySelector('input[type="radio"]');
+                if (radio) radio.checked = true;
+
+                // Toggle fields display and toggle inputs 'required' attribute to pass HTML validation
+                if (method === 'Credit Card') {
+                    cardFields.classList.remove('d-none');
+                    upiFields.classList.add('d-none');
+                    walletFields.classList.add('d-none');
+                    
+                    document.getElementById('card_num').required = true;
+                    document.getElementById('expiry').required = true;
+                    document.getElementById('cvv').required = true;
+                    document.getElementById('upi_id').required = false;
+                } else if (method === 'UPI') {
+                    cardFields.classList.add('d-none');
+                    upiFields.classList.remove('d-none');
+                    walletFields.classList.add('d-none');
+                    
+                    document.getElementById('card_num').required = false;
+                    document.getElementById('expiry').required = false;
+                    document.getElementById('cvv').required = false;
+                    document.getElementById('upi_id').required = true;
+                } else {
+                    cardFields.classList.add('d-none');
+                    upiFields.classList.add('d-none');
+                    walletFields.classList.remove('d-none');
+                    
+                    document.getElementById('card_num').required = false;
+                    document.getElementById('expiry').required = false;
+                    document.getElementById('cvv').required = false;
+                    document.getElementById('upi_id').required = false;
+                }
+            });
+        });
+    });
+</script>
+<style>
+    .payment-method-card {
+        cursor: pointer;
+        transition: var(--transition-smooth);
+        border-color: var(--border-color);
+        background-color: var(--bg-secondary);
+    }
+    .payment-method-card:hover {
+        border-color: var(--primary-color);
+    }
+    .payment-method-card.active {
+        border-color: var(--primary-color);
+        background-color: var(--primary-glow);
+        border-width: 2px;
+    }
+</style>
+{% endblock %}

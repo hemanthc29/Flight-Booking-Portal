@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Contact Support - SkyZone{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row g-5">
+        <!-- 1. Contact Information -->
+        <div class="col-lg-5 animate-on-scroll">
+            <h3 class="fw-bold mb-4">Get In Touch</h3>
+            <p class="text-secondary mb-4">Have questions about seat bookings, cancellation refunds, or promotional codes? Contact our customer support help desk.</p>
+            
+            <div class="d-flex flex-column gap-4">
+                <div class="d-flex gap-3">
+                    <div class="text-primary"><i class="fas fa-map-marker-alt fa-lg"></i></div>
+                    <div>
+                        <h6 class="fw-bold mb-1">Corporate HQ Address</h6>
+                        <span class="text-secondary small">77 Terminal Blvd, JFK International Airport, New York, USA</span>
+                    </div>
+                </div>
+
+                <div class="d-flex gap-3">
+                    <div class="text-primary"><i class="fas fa-phone-alt fa-lg"></i></div>
+                    <div>
+                        <h6 class="fw-bold mb-1">Phone Number</h6>
+                        <span class="text-secondary small">Support Hotline: +1 800 SKY BOOK (759-2665)</span>
+                    </div>
+                </div>
+
+                <div class="d-flex gap-3">
+                    <div class="text-primary"><i class="fas fa-envelope fa-lg"></i></div>
+                    <div>
+                        <h6 class="fw-bold mb-1">Email Address</h6>
+                        <span class="text-secondary small">bookings@skyzone.com | support@skyzone.com</span>
+                    </div>
+                </div>
+
+                <div class="d-flex gap-3">
+                    <div class="text-primary"><i class="fas fa-clock fa-lg"></i></div>
+                    <div>
+                        <h6 class="fw-bold mb-1">Office Operating Hours</h6>
+                        <span class="text-secondary small">Mon - Sun: 24/7 Support Desk availability</span>
+                    </div>
+                </div>
+            </div>
+            
+            <hr class="my-4" style="background-color: var(--border-color);">
+            
+            <h6 class="fw-bold mb-3">Connect via Social Media</h6>
+            <div class="d-flex gap-3">
+                <a href="#" class="btn btn-outline-primary btn-floating rounded-circle" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                <a href="#" class="btn btn-outline-primary btn-floating rounded-circle" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                <a href="#" class="btn btn-outline-primary btn-floating rounded-circle" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+            </div>
+        </div>
+
+        <!-- 2. Contact Message Form -->
+        <div class="col-lg-7 animate-on-scroll">
+            <div class="glass-card p-4 p-md-5">
+                <h4 class="fw-bold mb-3"><i class="fas fa-paper-plane text-primary me-2"></i>Send Message Support</h4>
+                <p class="text-secondary small mb-4">Complete the fields below to dispatch a message directly to our admins.</p>
+                
+                <form action="{% url 'flights:contact' %}" method="POST">
+                    {% csrf_token %}
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="contact_name" class="form-label small fw-bold">Your Name</label>
+                            <input type="text" name="name" id="contact_name" class="form-control" placeholder="John Doe" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="contact_email" class="form-label small fw-bold">Email Address</label>
+                            <input type="email" name="email" id="contact_email" class="form-control" placeholder="john@gmail.com" required>
+                        </div>
+                        <div class="col-12">
+                            <label for="contact_subject" class="form-label small fw-bold">Subject Topic</label>
+                            <input type="text" name="subject" id="contact_subject" class="form-control" placeholder="Seating upgrade question, Refund status..." required>
+                        </div>
+                        <div class="col-12">
+                            <label for="contact_message" class="form-label small fw-bold">Message Details</label>
+                            <textarea name="message" id="contact_message" class="form-control" rows="5" placeholder="State your inquiries..." required></textarea>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary rounded-pill px-5 py-2 mt-4 hover-glow" id="btn-send-message">Send Message</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

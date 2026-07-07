@@ -1,0 +1,189 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}SkyZone - Premium Flight Booking{% endblock %}</title>
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Book cheap flights, compare fares, select seats, and manage bookings instantly with SkyZone. The modern luxury booking engine.">
+    <meta name="keywords" content="flight booking, cheap tickets, seat selection, airline reservation, flight comparison">
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Custom Style System -->
+    <link href="{% static 'css/styles.css' %}" rel="stylesheet">
+    <script>
+        // Apply theme immediately to prevent FOUC (Flash of Unstyled Content)
+        if (localStorage.getItem('theme') === 'dark') {
+            document.documentElement.classList.add('dark-theme');
+        }
+    </script>
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+    <!-- 1. Loading Screen Animation -->
+    <div id="loader-screen">
+        <div class="loader-container">
+            <div class="loader-spinner"></div>
+            <i class="fa-solid fa-paper-plane loader-airplane"></i>
+        </div>
+        <div class="loader-logo">SKYZONE</div>
+    </div>
+
+    <!-- Page Transition Overlay -->
+    <div class="page-transition-overlay" id="page-transition-overlay"></div>
+
+    <!-- 2. Sticky frosted glass navigation bar -->
+    <nav class="navbar navbar-expand-lg sticky-navbar navbar-light">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center" href="{% url 'flights:home' %}" id="nav-brand-logo">
+                <i class="fa-solid fa-paper-plane text-primary me-2" style="font-size: 1.5rem;"></i>
+                <span style="font-weight: 800; font-size: 1.4rem; letter-spacing: 0.5px; color: var(--primary-color);">SKYZONE</span>
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation" id="btn-hamburger">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarContent">
+                <ul class="navbar-nav mx-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}" href="{% url 'flights:home' %}" id="nav-home">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'search' %}active{% endif %}" href="{% url 'flights:search' %}" id="nav-flights">Flights</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'about' %}active{% endif %}" href="{% url 'flights:about' %}" id="nav-about">About</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'contact' %}active{% endif %}" href="{% url 'flights:contact' %}" id="nav-contact">Contact</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'faq' %}active{% endif %}" href="{% url 'flights:faq' %}" id="nav-faq">FAQ</a>
+                    </li>
+                    {% if user.is_authenticated %}
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'my_bookings' %}active{% endif %}" href="{% url 'bookings:my_bookings' %}" id="nav-bookings">My Bookings</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'wishlist' %}active{% endif %}" href="{% url 'flights:wishlist' %}" id="nav-wishlist">Wishlist</a>
+                        </li>
+                    {% endif %}
+                </ul>
+                
+                <div class="d-flex align-items-center gap-2">
+                    <!-- Theme Toggle Button -->
+                    <button class="theme-toggle-btn me-1" id="theme-toggle-btn" aria-label="Toggle Theme" title="Toggle Theme">
+                        <i class="fas fa-moon"></i>
+                    </button>
+                    {% if user.is_authenticated %}
+                        {% if user.is_staff %}
+                            <a href="{% url 'flights:admin_dashboard' %}" class="btn btn-outline-primary btn-sm rounded-pill px-3" id="btn-admin-dash">Dashboard</a>
+                        {% endif %}
+                        <div class="dropdown">
+                            <a class="btn btn-primary rounded-pill px-3 d-flex align-items-center gap-2 dropdown-toggle" href="#" role="button" id="userMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-user-circle"></i> {{ user.username }}
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end shadow border-0 p-2 mt-2" aria-labelledby="userMenuLink" style="border-radius:12px; background:var(--bg-secondary);">
+                                <li><a class="dropdown-item rounded-3" href="{% url 'accounts:profile' %}" id="dropdown-profile"><i class="fas fa-user me-2 text-primary"></i>Profile</a></li>
+                                <li><a class="dropdown-item rounded-3 text-danger" href="{% url 'accounts:logout' %}" id="dropdown-logout"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+                            </ul>
+                        </div>
+                    {% else %}
+                        <a href="{% url 'accounts:login' %}" class="btn btn-outline-primary rounded-pill px-4" id="btn-login-redirect">Login</a>
+                        <a href="{% url 'accounts:register' %}" class="btn btn-primary rounded-pill px-4" id="btn-register-redirect">Register</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 3. Global Toast Notifications Container -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <!-- Django Messages Integration with Toast JS -->
+    {% if messages %}
+        <script>
+            window.addEventListener('DOMContentLoaded', () => {
+                {% for message in messages %}
+                    showToast("{{ message }}", "{% if message.tags == 'error' %}error{% else %}success{% endif %}");
+                {% endfor %}
+            });
+        </script>
+    {% endif %}
+
+    <!-- 4. Content Block -->
+    <main class="flex-grow-1">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- 5. Back to Top Button -->
+    <button type="button" class="btn btn-primary btn-floating btn-lg" id="btn-back-to-top" aria-label="Scroll back to top">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <!-- 6. Footer -->
+    <footer class="py-5 mt-auto" style="background: var(--bg-secondary); border-top: 1px solid var(--border-color);">
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-lg-4 col-md-6">
+                    <h5 class="fw-bold mb-3 text-primary">SKYZONE</h5>
+                    <p class="text-secondary small">SkyZone is a premier online flight booking solution. Enjoy modern user experience, custom seat selections, quick checkout, and live updates.</p>
+                    <div class="d-flex gap-3 mt-3">
+                        <a href="#" class="text-secondary" aria-label="Facebook"><i class="fab fa-facebook fa-lg"></i></a>
+                        <a href="#" class="text-secondary" aria-label="Twitter"><i class="fab fa-twitter fa-lg"></i></a>
+                        <a href="#" class="text-secondary" aria-label="Instagram"><i class="fab fa-instagram fa-lg"></i></a>
+                        <a href="#" class="text-secondary" aria-label="LinkedIn"><i class="fab fa-linkedin fa-lg"></i></a>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-6">
+                    <h6 class="fw-bold mb-3">Quick Links</h6>
+                    <ul class="list-unstyled small d-flex flex-column gap-2">
+                        <li><a href="{% url 'flights:home' %}" class="text-secondary text-decoration-none">Home</a></li>
+                        <li><a href="{% url 'flights:search' %}" class="text-secondary text-decoration-none">Search Flights</a></li>
+                        <li><a href="{% url 'flights:about' %}" class="text-secondary text-decoration-none">About Us</a></li>
+                        <li><a href="{% url 'flights:contact' %}" class="text-secondary text-decoration-none">Contact Us</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-2 col-md-6">
+                    <h6 class="fw-bold mb-3">Support</h6>
+                    <ul class="list-unstyled small d-flex flex-column gap-2">
+                        <li><a href="{% url 'flights:faq' %}" class="text-secondary text-decoration-none">FAQ Accordion</a></li>
+                        <li><a href="{% url 'flights:airports' %}" class="text-secondary text-decoration-none">Our Airports</a></li>
+                        <li><a href="{% url 'flights:airlines' %}" class="text-secondary text-decoration-none">Our Airlines</a></li>
+                        <li><a href="{% url 'flights:offers' %}" class="text-secondary text-decoration-none">Discount Offers</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-4 col-md-6">
+                    <h6 class="fw-bold mb-3">Newsletter</h6>
+                    <p class="text-secondary small mb-3">Subscribe to receive exclusive deals and new flight alerts.</p>
+                    <form action="{% url 'flights:newsletter_subscribe' %}" method="POST" class="d-flex gap-2">
+                        {% csrf_token %}
+                        <input type="email" name="email" class="form-control rounded-pill px-3" placeholder="Your email address" required id="newsletter-email">
+                        <button type="submit" class="btn btn-primary rounded-pill px-3" id="newsletter-btn">Join</button>
+                    </form>
+                </div>
+            </div>
+            <hr class="my-4" style="background-color: var(--border-color);">
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-2 small text-secondary">
+                <div>&copy; 2026 SkyZone Airlines. All rights reserved.</div>
+                <div class="d-flex gap-3">
+                    <a href="#" class="text-secondary text-decoration-none">Privacy Policy</a>
+                    <a href="#" class="text-secondary text-decoration-none">Terms of Service</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap 5 Bundle JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Custom JS File -->
+    <script src="{% static 'js/main.js' %}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
