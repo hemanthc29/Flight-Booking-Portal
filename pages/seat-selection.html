@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seat Selection - SkyZone</title>
+    
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Core Style -->
+    <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+
+    <!-- Global Loading Overlay -->
+    <div class="loader-overlay" id="global-loader">
+        <div class="loader-spinner"></div>
+        <div class="loader-text">Loading Cabin Layout...</div>
+    </div>
+
+    <!-- Header Navigation -->
+    <header class="header">
+        <div class="container nav-container">
+            <a href="../index.html" class="logo">
+                <i class="fas fa-paper-plane logo-icon"></i>
+                <span>SkyZone</span>
+            </a>
+            
+            <ul class="nav-menu" id="nav-menu">
+                <li><a href="../index.html" class="nav-link">Home</a></li>
+                <li><a href="flights.html" class="nav-link">Flights</a></li>
+                <li><a href="offers.html" class="nav-link">Offers</a></li>
+                <li><a href="my-bookings.html" class="nav-link">My Bookings</a></li>
+                <li><a href="about.html" class="nav-link">About Us</a></li>
+                <li><a href="contact.html" class="nav-link">Contact</a></li>
+            </ul>
+
+            <div class="nav-actions">
+                <button class="btn-icon" id="theme-toggle-btn" title="Toggle Light/Dark Theme">
+                    <i class="fas fa-moon"></i>
+                </button>
+                <a href="my-bookings.html" class="btn btn-primary btn-outline" style="padding: 8px 16px;">
+                    <i class="fas fa-ticket-alt"></i> My Passes
+                </a>
+                <button class="hamburger" id="hamburger-btn">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Top Route Info Banner -->
+    <section class="section-padding" style="background: linear-gradient(135deg, var(--primary-light), rgba(6, 182, 212, 0.05)); padding-top: calc(var(--header-height) + 30px); padding-bottom: 30px;">
+        <div class="container">
+            <h2 id="seat-route" style="font-size: 2.2rem; font-weight: 800;">Seat Selection</h2>
+            <p id="seat-flight-info" style="color: var(--text-secondary); font-weight: 500;">Please choose your flight seats.</p>
+        </div>
+    </section>
+
+    <!-- Main Selection Screen Layout -->
+    <main class="container section-padding" style="padding-top: 40px;">
+        <div class="seat-selection-container">
+            
+            <!-- Cabin Interactive Seat Layout -->
+            <div class="cabin-container animate-fade-in">
+                <div class="cabin-nose">
+                    <div class="cabin-nose-label">FLIGHT CABIN</div>
+                </div>
+
+                <!-- 7 columns: A, B, C, Aisle(row index), D, E, F -->
+                <div class="cabin-grid" id="seat-cabin-grid">
+                    <!-- Seats populated dynamically by script.js -->
+                </div>
+
+                <!-- Seat Grid Legend -->
+                <div class="cabin-legend">
+                    <div class="legend-item">
+                        <div class="legend-color available"></div>
+                        <span>Available ($20)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color selected"></div>
+                        <span>Selected</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color reserved"></div>
+                        <span>Reserved</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color exit"></div>
+                        <span>Exit Row Premium ($50)</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Booking Surcharges / Summary Sidebar -->
+            <div class="booking-summary-sidebar animate-slide-up">
+                
+                <!-- Flight Summary Card -->
+                <div class="summary-card">
+                    <h3 class="summary-title"><i class="fas fa-chair"></i> Seats Selection Details</h3>
+                    
+                    <div class="summary-row">
+                        <span>Required Seats:</span>
+                        <span id="seat-pax-needed" style="font-weight: 700;">1</span>
+                    </div>
+                    
+                    <div class="summary-row">
+                        <span>Selected Seats count:</span>
+                        <span id="selected-seats-count" style="font-weight: 700; color: var(--primary);">0</span>
+                    </div>
+
+                    <div class="summary-row" style="margin-bottom: 20px;">
+                        <span>Selected Seats:</span>
+                        <span id="selected-seats-list" style="font-weight: 700; color: var(--success);">None</span>
+                    </div>
+
+                    <div style="border-top: 1px solid var(--border-color); padding-top: 20px;">
+                        <div class="summary-row">
+                            <span>Base Airfare Total:</span>
+                            <span id="summary-base-price" style="font-weight: 600;">$0</span>
+                        </div>
+                        
+                        <div class="summary-row">
+                            <span>Seat Upgrades Fees:</span>
+                            <span id="summary-seat-surcharge" style="font-weight: 600;">$0</span>
+                        </div>
+                        
+                        <div class="summary-row total">
+                            <span>Current Total:</span>
+                            <span id="summary-grand-total">$0</span>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-primary" id="confirm-seats-btn" style="width: 100%; margin-top: 24px;">
+                        Confirm Seats & Continue <i class="fas fa-arrow-right"></i>
+                    </button>
+                    
+                    <a href="flights.html" class="btn btn-outline" style="width: 100%; margin-top: 12px;">
+                        <i class="fas fa-arrow-left"></i> Change Flight
+                    </a>
+                </div>
+
+                <!-- Airplane Baggage/Cabin Rules Alert Card -->
+                <div class="summary-card" style="background-color: var(--bg-tertiary); border: 1px dashed var(--border-color);">
+                    <h4 style="margin-bottom: 12px;"><i class="fas fa-info-circle" style="color: var(--primary);"></i> Cabin Seating Notice</h4>
+                    <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5;">Passengers occupying emergency Exit Rows (Row 5) must be 15 years or older, willing and capable of assisting in flight emergencies, and agree to airline operations terms.</p>
+                </div>
+
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container footer-grid">
+            <div class="footer-column">
+                <a href="../index.html" class="logo" style="margin-bottom: 16px;">
+                    <i class="fas fa-paper-plane logo-icon"></i>
+                    <span>SkyZone</span>
+                </a>
+                <p style="color: var(--text-secondary); font-size: 0.95rem; margin-bottom: 20px;">SkyZone is a premium flight aggregator offering comfortable journeys, dynamic boarding systems, and early booking ticket discounts.</p>
+                <div class="footer-socials">
+                    <a href="#" class="footer-social-btn"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="footer-social-btn"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="footer-social-btn"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="footer-social-btn"><i class="fab fa-linkedin-in"></i></a>
+                </div>
+            </div>
+
+            <div class="footer-column">
+                <h4>Quick Links</h4>
+                <ul class="footer-links">
+                    <li><a href="../index.html">Home</a></li>
+                    <li><a href="flights.html">Search Flights</a></li>
+                    <li><a href="offers.html">Discounts & Offers</a></li>
+                    <li><a href="about.html">Frequently Asked Questions</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-column">
+                <h4>Top Destinations</h4>
+                <ul class="footer-links">
+                    <li><a href="#" onclick="prefillDestinationSearch('DXB')">Dubai, UAE</a></li>
+                    <li><a href="#" onclick="prefillDestinationSearch('SIN')">Singapore Changi</a></li>
+                    <li><a href="#" onclick="prefillDestinationSearch('LHR')">London, United Kingdom</a></li>
+                    <li><a href="#" onclick="prefillDestinationSearch('CDG')">Paris, France</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-column">
+                <h4>Contact Us</h4>
+                <ul class="footer-links" style="color: var(--text-secondary); font-size: 0.95rem;">
+                    <li><i class="fas fa-phone-alt" style="color: var(--primary); margin-right: 8px;"></i> +1 (800) 555-FLYS</li>
+                    <li><i class="fas fa-envelope" style="color: var(--primary); margin-right: 8px;"></i> support@skyzone.com</li>
+                    <li><i class="fas fa-map-marker-alt" style="color: var(--primary); margin-right: 8px;"></i> 100 Flight Path, Jet Plaza, NY</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <p>&copy; 2026 SkyZone Airline Systems. All Rights Reserved. Designed for Python-FSD.</p>
+        </div>
+    </footer>
+
+    <!-- Back to Top Button -->
+    <button class="btn btn-primary btn-icon back-to-top" id="back-to-top-btn">
+        <i class="fas fa-chevron-up"></i>
+    </button>
+
+    <!-- Script imports -->
+    <script src="../script.js"></script>
+</body>
+</html>

@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About & FAQ - SkyZone</title>
+    
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Core Style -->
+    <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+
+    <!-- Global Loading Overlay -->
+    <div class="loader-overlay" id="global-loader">
+        <div class="loader-spinner"></div>
+        <div class="loader-text">Loading About Portal...</div>
+    </div>
+
+    <!-- Header Navigation -->
+    <header class="header">
+        <div class="container nav-container">
+            <a href="../index.html" class="logo">
+                <i class="fas fa-paper-plane logo-icon"></i>
+                <span>SkyZone</span>
+            </a>
+            
+            <ul class="nav-menu" id="nav-menu">
+                <li><a href="../index.html" class="nav-link">Home</a></li>
+                <li><a href="flights.html" class="nav-link">Flights</a></li>
+                <li><a href="offers.html" class="nav-link">Offers</a></li>
+                <li><a href="my-bookings.html" class="nav-link">My Bookings</a></li>
+                <li><a href="about.html" class="nav-link active">About Us</a></li>
+                <li><a href="contact.html" class="nav-link">Contact</a></li>
+            </ul>
+
+            <div class="nav-actions">
+                <button class="btn-icon" id="theme-toggle-btn" title="Toggle Light/Dark Theme">
+                    <i class="fas fa-moon"></i>
+                </button>
+                <a href="my-bookings.html" class="btn btn-primary btn-outline" style="padding: 8px 16px;">
+                    <i class="fas fa-ticket-alt"></i> My Passes
+                </a>
+                <button class="hamburger" id="hamburger-btn">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Top Route Info Banner -->
+    <section class="section-padding" style="background: linear-gradient(135deg, var(--primary-light), rgba(6, 182, 212, 0.05)); padding-top: calc(var(--header-height) + 30px); padding-bottom: 30px;">
+        <div class="container">
+            <h2>About SkyZone & Frequently Asked Questions</h2>
+            <p>Read about our company values, baggage rules, luggage weight guidelines, and find answers to general questions.</p>
+        </div>
+    </section>
+
+    <!-- Brand and Baggage Information section -->
+    <main class="container section-padding" style="padding-top: 40px;">
+        <div class="about-grid">
+            
+            <!-- Left Column: FAQ Accordion -->
+            <div>
+                <h3>Frequently Asked Questions</h3>
+                <p style="color: var(--text-secondary); margin-bottom: 24px;">Find answers below to frequently asked ticketing, check-in, and cancellation queries.</p>
+                
+                <div class="faq-accordion">
+                    <!-- Q1 -->
+                    <div class="accordion-item">
+                        <button class="accordion-header">
+                            <span>How do I book a flight?</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="accordion-content">
+                            <p>To book a flight, simply navigate to the Home page or Flights tab, select your departure and destination airports, choose your travel dates and passenger counts, pick a flight option, choose your cabin seats, fill in the passenger info forms, and proceed with payment check-out. A digital boarding pass will be generated instantly in your "My Bookings" page.</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Q2 -->
+                    <div class="accordion-item">
+                        <button class="accordion-header">
+                            <span>Can I cancel my ticket reservation?</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="accordion-content">
+                            <p>Yes. You can cancel your active reservation by visiting the "My Bookings" page and clicking "Cancel Reservation". A ticket cancellation alert will be sent, and your ticket status will be updated to "Cancelled".</p>
+                        </div>
+                    </div>
+
+                    <!-- Q3 -->
+                    <div class="accordion-item">
+                        <button class="accordion-header">
+                            <span>Is online check-in available?</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="accordion-content">
+                            <p>Online check-in opens 24 hours prior to scheduled flight departure. You can check in directly through your boarding pass widget in the "My Bookings" page to download your final boarding barcoded tickets.</p>
+                        </div>
+                    </div>
+
+                    <!-- Q4 -->
+                    <div class="accordion-item">
+                        <button class="accordion-header">
+                            <span>What documents are required for international flights?</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="accordion-content">
+                            <p>For international routes, passengers must possess a passport with at least 6 months validity from the travel date, a valid travel visa, and health registration documents as specified by the destination country's regulations.</p>
+                        </div>
+                    </div>
+
+                    <!-- Q5 -->
+                    <div class="accordion-item">
+                        <button class="accordion-header">
+                            <span>Can I change my travel date?</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="accordion-content">
+                            <p>Yes. Ticket rebooking is permitted up to 12 hours prior to flight departure. Please contact our 24/7 customer support desk (+1-800-555-FLYS) or email us to adjust travel date parameters.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Baggage Guidelines -->
+            <div>
+                <div class="summary-card" style="margin-bottom: 24px;">
+                    <h3 style="margin-bottom: 16px;"><i class="fas fa-luggage-cart" style="color: var(--primary);"></i> Baggage Allowance</h3>
+                    <ul class="footer-links" style="display: flex; flex-direction: column; gap: 16px; color: var(--text-secondary); font-size: 0.95rem;">
+                        <li style="border-bottom: 1px solid var(--border-color); padding-bottom: 12px;">
+                            <strong style="color: var(--text-primary); display: block;"><i class="fas fa-suitcase"></i> Cabin Baggage:</strong>
+                            1 piece up to 7 kg is permitted free of charge across all travel classes. Fits in overhead lockers or under seat.
+                        </li>
+                        <li style="border-bottom: 1px solid var(--border-color); padding-bottom: 12px;">
+                            <strong style="color: var(--text-primary); display: block;"><i class="fas fa-suitcase-rolling"></i> Checked Baggage:</strong>
+                            Up to 23 kg check-in baggage is allowed for Economy passengers. Business & First class enjoy up to 32 kg baggage allowance.
+                        </li>
+                        <li>
+                            <strong style="color: var(--text-primary); display: block;"><i class="fas fa-plus-circle"></i> Extra Baggage Surcharges:</strong>
+                            Additional weight bags can be pre-purchased during flight booking details at a flat rate of $45 per +15 kg bag.
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="summary-card" style="background-color: rgba(239, 68, 68, 0.05); border: 1px dashed var(--danger);">
+                    <h4 style="color: var(--danger); margin-bottom: 12px;"><i class="fas fa-exclamation-triangle"></i> Prohibited Items</h4>
+                    <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 10px;">The following items are strictly prohibited inside cabin and checked baggage:</p>
+                    <ul style="font-size: 0.85rem; color: var(--text-secondary); padding-left: 20px;">
+                        <li>Flammable liquids, lighter fuels</li>
+                        <li>Explosives, fireworks, ammunition</li>
+                        <li>Corrosives, bleach, mercury items</li>
+                        <li>Lithium batteries (power banks must remain in cabin bag only)</li>
+                    </ul>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container footer-grid">
+            <div class="footer-column">
+                <a href="../index.html" class="logo" style="margin-bottom: 16px;">
+                    <i class="fas fa-paper-plane logo-icon"></i>
+                    <span>SkyZone</span>
+                </a>
+                <p style="color: var(--text-secondary); font-size: 0.95rem; margin-bottom: 20px;">SkyZone is a premium flight aggregator offering comfortable journeys, dynamic boarding systems, and early booking ticket discounts.</p>
+                <div class="footer-socials">
+                    <a href="#" class="footer-social-btn"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="footer-social-btn"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="footer-social-btn"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="footer-social-btn"><i class="fab fa-linkedin-in"></i></a>
+                </div>
+            </div>
+
+            <div class="footer-column">
+                <h4>Quick Links</h4>
+                <ul class="footer-links">
+                    <li><a href="../index.html">Home</a></li>
+                    <li><a href="flights.html">Search Flights</a></li>
+                    <li><a href="offers.html">Discounts & Offers</a></li>
+                    <li><a href="about.html">Frequently Asked Questions</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-column">
+                <h4>Top Destinations</h4>
+                <ul class="footer-links">
+                    <li><a href="#" onclick="prefillDestinationSearch('DXB')">Dubai, UAE</a></li>
+                    <li><a href="#" onclick="prefillDestinationSearch('SIN')">Singapore Changi</a></li>
+                    <li><a href="#" onclick="prefillDestinationSearch('LHR')">London, United Kingdom</a></li>
+                    <li><a href="#" onclick="prefillDestinationSearch('CDG')">Paris, France</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-column">
+                <h4>Contact Us</h4>
+                <ul class="footer-links" style="color: var(--text-secondary); font-size: 0.95rem;">
+                    <li><i class="fas fa-phone-alt" style="color: var(--primary); margin-right: 8px;"></i> +1 (800) 555-FLYS</li>
+                    <li><i class="fas fa-envelope" style="color: var(--primary); margin-right: 8px;"></i> support@skyzone.com</li>
+                    <li><i class="fas fa-map-marker-alt" style="color: var(--primary); margin-right: 8px;"></i> 100 Flight Path, Jet Plaza, NY</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <p>&copy; 2026 SkyZone Airline Systems. All Rights Reserved. Designed for Python-FSD.</p>
+        </div>
+    </footer>
+
+    <!-- Back to Top Button -->
+    <button class="btn btn-primary btn-icon back-to-top" id="back-to-top-btn">
+        <i class="fas fa-chevron-up"></i>
+    </button>
+
+    <!-- Script imports -->
+    <script src="../script.js"></script>
+</body>
+</html>

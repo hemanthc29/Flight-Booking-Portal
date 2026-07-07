@@ -1,8 +1,21 @@
-__pycache__/
-*.pyc
-.gemini/
+# IDEs and editors
 .idea/
 .vscode/
-*.log
-*.sqlite3
-db.sqlite3
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# OS files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Project local files
+.gemini/
+.agents/
+lkdn pic.png
+*.png
+!assets/images/**/*.png
+!assets/images/*.png

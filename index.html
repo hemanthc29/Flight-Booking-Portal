@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SkyZone - Luxury Flight Booking Portal</title>
+    <meta name="description" content="Search flights, compare cheap fares, view active flight schedules, and book tickets instantly with our premium flight portal.">
+    
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Core Style -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- Global Loading Overlay -->
+    <div class="loader-overlay" id="global-loader">
+        <div class="loader-spinner"></div>
+        <div class="loader-text">Loading SkyZone...</div>
+    </div>
+
+    <!-- Header Navigation -->
+    <header class="header">
+        <div class="container nav-container">
+            <a href="index.html" class="logo">
+                <i class="fas fa-paper-plane logo-icon"></i>
+                <span>SkyZone</span>
+            </a>
+            
+            <ul class="nav-menu" id="nav-menu">
+                <li><a href="index.html" class="nav-link active">Home</a></li>
+                <li><a href="pages/flights.html" class="nav-link">Flights</a></li>
+                <li><a href="pages/offers.html" class="nav-link">Offers</a></li>
+                <li><a href="pages/my-bookings.html" class="nav-link">My Bookings</a></li>
+                <li><a href="pages/about.html" class="nav-link">About Us</a></li>
+                <li><a href="pages/contact.html" class="nav-link">Contact</a></li>
+            </ul>
+
+            <div class="nav-actions">
+                <button class="btn-icon" id="theme-toggle-btn" title="Toggle Light/Dark Theme">
+                    <i class="fas fa-moon"></i>
+                </button>
+                <a href="pages/my-bookings.html" class="btn btn-primary btn-outline" style="padding: 8px 16px;">
+                    <i class="fas fa-ticket-alt"></i> My Passes
+                </a>
+                <button class="hamburger" id="hamburger-btn">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Banner with Flight Search Form -->
+    <section class="hero animate-fade-in">
+        <div class="container hero-content">
+            <div class="hero-text">
+                <h1>Ready to Fly with Style?</h1>
+                <p>Compare and book flight tickets from hundreds of airlines to destinations across the globe, with flexible fare selections, customizable seats, and early-bird discounts.</p>
+                <div class="flex gap-2">
+                    <a href="pages/offers.html" class="btn btn-secondary">Explore Special Offers</a>
+                    <a href="#popular-destinations" class="btn btn-outline">Explore Destinations</a>
+                </div>
+            </div>
+
+            <!-- Search Form Widget -->
+            <div class="search-widget animate-slide-up">
+                <div class="search-tabs">
+                    <button class="tab-btn active" data-trip-type="one-way">One Way</button>
+                    <button class="tab-btn" data-trip-type="round-trip">Round Trip</button>
+                </div>
+
+                <form id="flight-search-form">
+                    <div class="search-grid">
+                        <div class="form-group form-group-full">
+                            <label><i class="fas fa-plane-departure"></i> From Airport</label>
+                            <select id="from-airport" class="form-input" required>
+                                <option value="" disabled selected>Select Origin</option>
+                                <option value="JFK">New York (JFK)</option>
+                                <option value="LHR">London Heathrow (LHR)</option>
+                                <option value="DXB">Dubai International (DXB)</option>
+                                <option value="SIN">Singapore Changi (SIN)</option>
+                                <option value="HND">Tokyo Haneda (HND)</option>
+                                <option value="CDG">Paris Charles de Gaulle (CDG)</option>
+                                <option value="SYD">Sydney Airport (SYD)</option>
+                                <option value="BKK">Bangkok Suvarnabhumi (BKK)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group form-group-full">
+                            <label><i class="fas fa-plane-arrival"></i> To Airport</label>
+                            <select id="to-airport" class="form-input" required>
+                                <option value="" disabled selected>Select Destination</option>
+                                <option value="SIN">Singapore Changi (SIN)</option>
+                                <option value="LHR">London Heathrow (LHR)</option>
+                                <option value="DXB">Dubai International (DXB)</option>
+                                <option value="JFK">New York (JFK)</option>
+                                <option value="HND">Tokyo Haneda (HND)</option>
+                                <option value="CDG">Paris Charles de Gaulle (CDG)</option>
+                                <option value="SYD">Sydney Airport (SYD)</option>
+                                <option value="BKK">Bangkok Suvarnabhumi (BKK)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label><i class="fas fa-calendar-alt"></i> Depart Date</label>
+                            <input type="date" id="dep-date" class="form-input" required>
+                        </div>
+
+                        <div class="form-group" id="ret-date-group" style="display: none;">
+                            <label><i class="fas fa-calendar-alt"></i> Return Date</label>
+                            <input type="date" id="ret-date" class="form-input">
+                        </div>
+
+                        <div class="form-group">
+                            <label><i class="fas fa-users"></i> Passengers</label>
+                            <select id="passenger-count" class="form-input">
+                                <option value="1">1 Passenger</option>
+                                <option value="2">2 Passengers</option>
+                                <option value="3">3 Passengers</option>
+                                <option value="4">4 Passengers</option>
+                                <option value="5">5 Passengers</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label><i class="fas fa-crown"></i> Travel Class</label>
+                            <select id="travel-class" class="form-input">
+                                <option value="economy">Economy</option>
+                                <option value="premium-economy">Premium Economy</option>
+                                <option value="business">Business Class</option>
+                                <option value="first-class">First Class</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">
+                        <i class="fas fa-search"></i> Search Available Flights
+                    </button>
+                </form>
+
+                <!-- Recent Searches Chip Widget -->
+                <div class="recent-searches-container" style="display: block;">
+                    <div class="recent-searches-title">Recent Searches</div>
+                    <div class="recent-chips" id="recent-chips-holder">
+                        <!-- Chips inserted dynamically by JS -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Popular Destinations Section -->
+    <section class="section-padding container" id="popular-destinations">
+        <div class="text-center animate-slide-up" style="margin-bottom: 50px;">
+            <h2>Popular Destinations</h2>
+            <p style="color: var(--text-secondary); max-width: 600px; margin: 10px auto 0;">Explore top cities across the globe and grab special discounted offers on tickets.</p>
+        </div>
+
+        <div class="destinations-grid">
+            <!-- Dubai -->
+            <div class="destination-card">
+                <div class="dest-img-container">
+                    <img src="https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&w=600&q=80" alt="Dubai" class="dest-img">
+                    <div class="dest-price-badge">From $320</div>
+                </div>
+                <div class="dest-body">
+                    <h4>Dubai, UAE</h4>
+                    <p>Experience the ultimate fusion of modern design, sandy beaches, and dynamic cityscape.</p>
+                    <button class="btn btn-outline" style="width: 100%;" onclick="prefillDestinationSearch('DXB')">Book Flight</button>
+                </div>
+            </div>
+
+            <!-- Singapore -->
+            <div class="destination-card">
+                <div class="dest-img-container">
+                    <img src="https://images.unsplash.com/photo-1525625293386-3f8f99389edd?auto=format&fit=crop&w=600&q=80" alt="Singapore" class="dest-img">
+                    <div class="dest-price-badge">From $110</div>
+                </div>
+                <div class="dest-body">
+                    <h4>Singapore</h4>
+                    <p>Delight in spectacular gardens, premium airport transit lounges, and mouthwatering cuisines.</p>
+                    <button class="btn btn-outline" style="width: 100%;" onclick="prefillDestinationSearch('SIN')">Book Flight</button>
+                </div>
+            </div>
+
+            <!-- London -->
+            <div class="destination-card">
+                <div class="dest-img-container">
+                    <img src="https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&w=600&q=80" alt="London" class="dest-img">
+                    <div class="dest-price-badge">From $450</div>
+                </div>
+                <div class="dest-body">
+                    <h4>London, UK</h4>
+                    <p>Immerse yourself in rich history, Royal Palace guards, and theatrical entertainment.</p>
+                    <button class="btn btn-outline" style="width: 100%;" onclick="prefillDestinationSearch('LHR')">Book Flight</button>
+                </div>
+            </div>
+
+            <!-- Paris -->
+            <div class="destination-card">
+                <div class="dest-img-container">
+                    <img src="https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=600&q=80" alt="Paris" class="dest-img">
+                    <div class="dest-price-badge">From $95</div>
+                </div>
+                <div class="dest-body">
+                    <h4>Paris, France</h4>
+                    <p>Explore classic historical architecture, cozy cafes, and the romantic Eiffel Tower.</p>
+                    <button class="btn btn-outline" style="width: 100%;" onclick="prefillDestinationSearch('CDG')">Book Flight</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Latest Offers Section -->
+    <section class="section-padding" style="background-color: var(--bg-secondary);">
+        <div class="container">
+            <div class="text-center" style="margin-bottom: 50px;">
+                <h2>Latest Flight Discounts</h2>
+                <p style="color: var(--text-secondary);">Save more with credit cards, early booking, and student special fare deals.</p>
+            </div>
+
+            <div class="offers-grid">
+                <div class="offer-card primary">
+                    <div class="offer-header">
+                        <div class="offer-discount">20% OFF</div>
+                        <div class="offer-code" onclick="copyPromoCode('STUDENT20')">STUDENT20</div>
+                    </div>
+                    <h4>Student Flight Special</h4>
+                    <p>Get up to 20% off base airfare rates. Applicable with valid student IDs at boarding check-in.</p>
+                    <div class="offer-timer"><i class="far fa-clock"></i> Ends in: <span>10h 45m 00s</span></div>
+                </div>
+
+                <div class="offer-card secondary">
+                    <div class="offer-header">
+                        <div class="offer-discount">10% OFF</div>
+                        <div class="offer-code" onclick="copyPromoCode('EARLY10')">EARLY10</div>
+                    </div>
+                    <h4>Early Bird Discount</h4>
+                    <p>Plan ahead, reserve flight seats early and score an extra 10% discount on flight costs.</p>
+                    <div class="offer-timer"><i class="far fa-clock"></i> Ends in: <span>10h 45m 00s</span></div>
+                </div>
+
+                <div class="offer-card primary">
+                    <div class="offer-header">
+                        <div class="offer-discount">15% OFF</div>
+                        <div class="offer-code" onclick="copyPromoCode('FESTIVAL15')">FESTIVAL15</div>
+                    </div>
+                    <h4>Festive Season Special</h4>
+                    <p>Celebrate holidays with extra cash savings! Get a flat 15% discount on international flights.</p>
+                    <div class="offer-timer"><i class="far fa-clock"></i> Ends in: <span>10h 45m 00s</span></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Customer Reviews Section -->
+    <section class="section-padding container">
+        <div class="text-center" style="margin-bottom: 50px;">
+            <h2>Passenger Testimonials</h2>
+            <p style="color: var(--text-secondary);">Here's what our passengers say about their booking and travel experiences.</p>
+        </div>
+
+        <div class="grid" style="grid-template-columns: repeat(3, 1fr); gap: 24px;">
+            <div class="summary-card" style="padding: 30px;">
+                <div class="flex align-center gap-2" style="margin-bottom: 20px;">
+                    <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80" alt="Sarah" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover;">
+                    <div>
+                        <h4 style="font-size: 1rem;">Sarah Jenkins</h4>
+                        <div style="color: var(--warning); font-size: 0.8rem;">
+                            <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                        </div>
+                    </div>
+                </div>
+                <p style="color: var(--text-secondary); font-size: 0.95rem; font-style: italic;">"Booking a flight was extremely smooth. I loved the visual seat selector map! Getting a student code discount saved me so much money. Will definitely book again!"</p>
+            </div>
+
+            <div class="summary-card" style="padding: 30px;">
+                <div class="flex align-center gap-2" style="margin-bottom: 20px;">
+                    <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&q=80" alt="Mark" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover;">
+                    <div>
+                        <h4 style="font-size: 1rem;">Mark Robinson</h4>
+                        <div style="color: var(--warning); font-size: 0.8rem;">
+                            <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="far fa-star"></i>
+                        </div>
+                    </div>
+                </div>
+                <p style="color: var(--text-secondary); font-size: 0.95rem; font-style: italic;">"Fast loading pages and clean modern dashboard layouts. Customer support response time is fantastic. Highly recommend this airline ticket booking platform."</p>
+            </div>
+
+            <div class="summary-card" style="padding: 30px;">
+                <div class="flex align-center gap-2" style="margin-bottom: 20px;">
+                    <img src="https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=150&q=80" alt="Emily" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover;">
+                    <div>
+                        <h4 style="font-size: 1rem;">Emily Watson</h4>
+                        <div style="color: var(--warning); font-size: 0.8rem;">
+                            <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                        </div>
+                    </div>
+                </div>
+                <p style="color: var(--text-secondary); font-size: 0.95rem; font-style: italic;">"Dark mode toggle works perfectly across all pages. The barcode boarding pass generated works like a charm. Very neat layout design."</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container footer-grid">
+            <div class="footer-column">
+                <a href="index.html" class="logo" style="margin-bottom: 16px;">
+                    <i class="fas fa-paper-plane logo-icon"></i>
+                    <span>SkyZone</span>
+                </a>
+                <p style="color: var(--text-secondary); font-size: 0.95rem; margin-bottom: 20px;">SkyZone is a premium flight aggregator offering comfortable journeys, dynamic boarding systems, and early booking ticket discounts.</p>
+                <div class="footer-socials">
+                    <a href="#" class="footer-social-btn"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="footer-social-btn"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="footer-social-btn"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="footer-social-btn"><i class="fab fa-linkedin-in"></i></a>
+                </div>
+            </div>
+
+            <div class="footer-column">
+                <h4>Quick Links</h4>
+                <ul class="footer-links">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="pages/flights.html">Search Flights</a></li>
+                    <li><a href="pages/offers.html">Discounts & Offers</a></li>
+                    <li><a href="pages/about.html">Frequently Asked Questions</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-column">
+                <h4>Top Destinations</h4>
+                <ul class="footer-links">
+                    <li><a href="#" onclick="prefillDestinationSearch('DXB')">Dubai, UAE</a></li>
+                    <li><a href="#" onclick="prefillDestinationSearch('SIN')">Singapore Changi</a></li>
+                    <li><a href="#" onclick="prefillDestinationSearch('LHR')">London, United Kingdom</a></li>
+                    <li><a href="#" onclick="prefillDestinationSearch('CDG')">Paris, France</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-column">
+                <h4>Contact Us</h4>
+                <ul class="footer-links" style="color: var(--text-secondary); font-size: 0.95rem;">
+                    <li><i class="fas fa-phone-alt" style="color: var(--primary); margin-right: 8px;"></i> +1 (800) 555-FLYS</li>
+                    <li><i class="fas fa-envelope" style="color: var(--primary); margin-right: 8px;"></i> support@skyzone.com</li>
+                    <li><i class="fas fa-map-marker-alt" style="color: var(--primary); margin-right: 8px;"></i> 100 Flight Path, Jet Plaza, NY</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <p>&copy; 2026 SkyZone Airline Systems. All Rights Reserved. Designed for Python-FSD.</p>
+        </div>
+    </footer>
+
+    <!-- Back to Top Button -->
+    <button class="btn btn-primary btn-icon back-to-top" id="back-to-top-btn">
+        <i class="fas fa-chevron-up"></i>
+    </button>
+
+    <!-- Scripts -->
+    <script src="script.js"></script>
+    <script>
+        function prefillDestinationSearch(code) {
+            const selectTo = document.getElementById("to-airport");
+            if (selectTo) {
+                selectTo.value = code;
+                window.scrollTo({ top: 100, behavior: 'smooth' });
+                showToast(`Destination selected: ${code}. Please complete the rest of the form!`, "warning");
+            }
+        }
+    </script>
+</body>
+</html>
